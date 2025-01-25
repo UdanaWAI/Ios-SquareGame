@@ -11,7 +11,7 @@ import SwiftUI
 struct Square_gameApp: App {
     var body: some Scene {
         WindowGroup {
-            GridView()
+            HomeView()
         }
     }
 }
