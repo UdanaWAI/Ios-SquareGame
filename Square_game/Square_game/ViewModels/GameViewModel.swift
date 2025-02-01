@@ -1,66 +1,73 @@
-import SwiftUI
-
-class GameViewModel: ObservableObject {
-    let colors: [Color] = [.red, .blue, .green, .orange, .brown, .purple, .cyan, .indigo]
-    
-    @Published var model = GameModel()
-    @Published var buttonColors: [Color] = []
-    @Published var showRestartButton: Bool = false
-
-    init() {
-        buttonColors = generateButtonColors()
-    }
-
-    func generateButtonColors() -> [Color] {
-        var uniqueColors = Set<Color>()
-        let repeatedColor = colors.randomElement() ?? .black
-        uniqueColors.insert(repeatedColor)
-        
-        while uniqueColors.count < 8 {
-            if let randomColor = colors.randomElement(), !uniqueColors.contains(randomColor) {
-                uniqueColors.insert(randomColor)
-            }
-        }
-
-        var colorsArray = Array(uniqueColors) + [repeatedColor]
-        colorsArray.shuffle()
-        return colorsArray
-    }
-
-    func handleButtonClick(index: Int) {
-        let color = buttonColors[index]
-        
-        if let lastClickedIndex = model.lastClickedButtonIndex, lastClickedIndex == index {
-            return
-        }
-        
-        if let clickedColor = model.clickedColor {
-            if clickedColor == color {
-                model.score += 1
-                buttonColors = generateButtonColors()
-                model.lastClickedButtonIndex = nil
-                model.clickedColor = nil
-            } else {
-                if model.score > model.highScore {
-                    model.highScore = model.score
-                }
-                model.score = 0
-                showRestartButton = true
-                model.clickedColor = color
-                model.lastClickedButtonIndex = index
-            }
-        } else {
-            model.clickedColor = color
-            model.lastClickedButtonIndex = index
-        }
-        
-        objectWillChange.send()
-    }
-
-    func restartGame() {
-        model = GameModel()
-        buttonColors = generateButtonColors()
-        showRestartButton = false
-        objectWillChange.send()
-    }
-}
+//import SwiftUI
+//
+//class GameViewModel: ObservableObject {
+//    let colors: [Color] = [.red, .blue, .green, .orange, .brown, .purple, .cyan, .indigo]
+//
+//    @Published var model = GameModel()
+//    @Published var buttonColors: [Color] = []
+//    @Published var showRestartButton: Bool = false
+//    @Published var selectedIndexes: [Int] = []
+//
+//    private var unmatchedIndex: Int = -1
+//
+//    init() {
+//        restartGame()
+//    }
+//
+//    func generateButtonColors() -> [Color] {
+//        let selectedColors = colors.shuffled().prefix(4)
+//        var colorPairs = Array(selectedColors) + Array(selectedColors)
+//
+//        let uniqueColor = colors.filter { !selectedColors.contains($0) }.randomElement() ?? .gray
+//        colorPairs.append(uniqueColor)
+//
+//        colorPairs.shuffle()
+//        unmatchedIndex = colorPairs.firstIndex(of: uniqueColor) ?? -1 // Update unmatched index
+//
+//        return colorPairs
+//    }
+//
+//    func handleButtonClick(index: Int) {
+//        guard !selectedIndexes.contains(index), selectedIndexes.count < 2 else { return }
+//
+//        selectedIndexes.append(index)
+//
+//        if selectedIndexes.count == 2 {
+//            checkForMatch()
+//        }
+//    }
+//
+//    private func checkForMatch() {
+//        let firstColor = buttonColors[selectedIndexes[0]]
+//        let secondColor = buttonColors[selectedIndexes[1]]
+//
+//        if selectedIndexes.contains(unmatchedIndex) {
+//            handleMismatch()
+//        } else if firstColor == secondColor {
+//            handleCorrectMatch()
+//        } else {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                self.selectedIndexes.removeAll()
+//            }
+//        }
+//    }
+//
+//    private func handleCorrectMatch() {
+//        model.score += 1
+//        selectedIndexes.removeAll()
+//        buttonColors = generateButtonColors()
+//    }
+//
+//    private func handleMismatch() {
+//        model.highScore = max(model.highScore, model.score)
+//        model.score = 0
+//        showRestartButton = true
+//    }
+//
+//    func restartGame() {
+//        model = GameModel()
+//        buttonColors = generateButtonColors()
+//        selectedIndexes.removeAll()
+//        showRestartButton = false
+//    }
+//}
